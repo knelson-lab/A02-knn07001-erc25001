@@ -39,3 +39,27 @@ mlp = MLPRegressor(hidden_layer_sizes = (100, 50),
 mlp.fit(X_train_scaled, y_train)
 
 # Step 5: Evaluate the model on the validation set
+
+y_val_pred = mlp.predict(X_val_scaled)
+print("Validation MSE:", mean_squared_error(y_val, y_val_pred))
+print("Validation R2:", r2_score(y_val, y_val_pred))
+# -----------------------------
+# Step 5: Train predictions + plot (PR #3)
+# -----------------------------
+train_pred = mlp.predict(X_train_scaled)
+
+plt.figure(figsize=(6, 6))
+plt.scatter(y_train, train_pred, alpha=0.3)
+plt.xlabel("Actual Train Values")
+plt.ylabel("Predicted Train Values")
+plt.title("MLPRegressor — Training Predictions")
+plt.grid(True)
+plt.plot(
+    [y_train.min(), y_train.max()],
+    [y_train.min(), y_train.max()],
+    "r--",
+    linewidth=2
+)
+plt.tight_layout()
+plt.savefig("../figs/train_predictions.png")
+plt.close()
