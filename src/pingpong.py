@@ -31,5 +31,9 @@ X_val_scaled   = scaler.transform(X_val)
 X_test_scaled  = scaler.transform(X_test)
 
 # Step 4: Train a simple model with limited hyperparameters aside from early stopping
-mlp = MLPRegressor(early_stopping = True)
+mlp = MLPRegressor(hidden_layer_sizes = (100, 50), 
+                   activation = 'relu',
+                   max_iter = 500,  
+                   random_state = 42, 
+                   early_stopping = True)
 mlp.fit(X_train_scaled, y_train)
