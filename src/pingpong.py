@@ -61,5 +61,5 @@ plt.plot(
     linewidth=2
 )
 plt.tight_layout()
-plt.savefig("../figs/train_predictions.png")
+plt.savefig("./figures/train_predictions.png")
 plt.close()
