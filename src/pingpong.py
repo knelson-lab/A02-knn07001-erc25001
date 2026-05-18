@@ -5,9 +5,12 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score, mean_absolute_error, mean_absolute_percentage_error, mean_squared_error
 from sklearn import metrics
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
 from sklearn.datasets import fetch_california_housing
 import matplotlib.pyplot as plt
 
+seed = 1313
 
 housing = fetch_california_housing(as_frame=True)
 df = housing.frame
@@ -31,11 +34,41 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_val_scaled   = scaler.transform(X_val)
 X_test_scaled  = scaler.transform(X_test)
 
+# -----------------------------
+# Step 3.1: Perform grid search for hyperparameter tuning  
+# Create pipeline
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),  # MLP is sensitive to feature scaling
+    ('mlp', MLPRegressor(max_iter = 1000, random_state = seed))
+])
+# Define the hyperparameters to search
+grid_params_mlp = {
+    'mlp__hidden_layer_sizes': [(25, ), (25, 25), (50, ) , (50, 50), (100, ), (100, 50), (100, 100)],
+    'mlp__activation': ['relu', 'tanh'],
+    'mlp__learning_rate': ['constant', 'adaptive'],
+}
+
+gs = GridSearchCV(estimator = pipeline,
+                  param_grid = grid_params_mlp,
+                  cv = 10,
+                  scoring = 'neg_mean_squared_error'
+)
+
+# Fit the grid search
+gs.fit(X_train_scaled, y_train)
+
+# Best params
+print('Best params: %s' % gs.best_params_)
+# Best training data negative mean squared error  
+print('Best training negative mean squared error: %.3f' % gs.best_score_)
+# -----------------------------
+
 # Step 4: Train a simple model with limited hyperparameters aside from early stopping
 mlp = MLPRegressor(hidden_layer_sizes = (100, 50), 
                    activation = 'relu',
                    max_iter = 500,  
                    random_state = 42, 
+                   learning_rate = 'constant',
                    early_stopping = True)
 mlp.fit(X_train_scaled, y_train)
 
