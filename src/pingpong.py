@@ -3,10 +3,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import r2_score, mean_absolute_error, mean_absolute_percentage_error, mean_squared_error
 from sklearn import metrics
 from sklearn.datasets import fetch_california_housing
 import matplotlib.pyplot as plt
+import networkx as nx
 
 housing = fetch_california_housing(as_frame=True)
 df = housing.frame
@@ -43,8 +44,10 @@ mlp.fit(X_train_scaled, y_train)
 y_val_pred = mlp.predict(X_val_scaled)
 print("Validation MSE:", mean_squared_error(y_val, y_val_pred))
 print("Validation R2:", r2_score(y_val, y_val_pred))
+
+
 # -----------------------------
-# Step 5: Train predictions + plot (PR #3)
+# Step 6: Train predictions + plot (PR #3)
 # -----------------------------
 train_pred = mlp.predict(X_train_scaled)
 
@@ -63,3 +66,43 @@ plt.plot(
 plt.tight_layout()
 plt.savefig("./figs/train_predictions.png")
 plt.close()
+
+
+# Step 7: Plot epoch vs. validation score
+val_scores = mlp.validation_scores_
+
+plt.figure(figsize = (8, 5))
+plt.plot(val_scores, marker = "o")
+plt.axhline(
+    mlp.best_validation_score_,
+    linestyle = "--",
+    label=f"Best val score = {mlp.best_validation_score_:.3f}"
+)
+plt.xlabel("Epoch")
+plt.ylabel("Validation score (R²)")
+plt.title("Validation Score vs Epoch (sklearn MLPRegressor)")
+plt.legend()
+plt.grid(True)
+plt.savefig("./figs/epoch_vs.validation.png")
+
+# Step 8: Evaluate the model on the test set
+y_pred_val   = mlp.predict(X_val_scaled)
+y_pred_test  = mlp.predict(X_test_scaled)
+
+# Step 9: Evaluate metrics for model fit 
+def metrics_row(name, y_true, y_pred):
+    return {
+        "split": name,
+        "R2": r2_score(y_true, y_pred),
+        "MAE": mean_absolute_error(y_true, y_pred),
+        "MAPE": mean_absolute_percentage_error(y_true, y_pred),
+    }
+
+metrics_df = pd.DataFrame([
+    metrics_row("train", y_train, train_pred),
+    metrics_row("val",   y_val,   y_pred_val),
+    metrics_row("test",  y_test,  y_pred_test),
+])
+
+print("=== Metrics (defaults) ===")
+print(metrics_df.to_string(index = False))
