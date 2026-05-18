@@ -106,3 +106,20 @@ metrics_df = pd.DataFrame([
 
 print("=== Metrics (defaults) ===")
 print(metrics_df.to_string(index = False))
+
+# Step 10: Plot actual vs predicted values for the test set
+plt.figure(figsize=(6, 6))
+plt.scatter(y_test, y_pred_test, alpha=0.3)
+plt.xlabel("Actual Test Values")
+plt.ylabel("Predicted Test Values")
+plt.title("MLPRegressor — Test Predictions")
+plt.grid(True)
+plt.plot(
+    [y_test.min(), y_test.max()],
+    [y_test.min(), y_test.max()],
+    "r--",
+    linewidth=2
+)
+plt.tight_layout()
+plt.savefig("./figs/test_predictions.png")
+plt.show()
