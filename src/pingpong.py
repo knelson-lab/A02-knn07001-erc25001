@@ -7,7 +7,7 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_absolute_percent
 from sklearn import metrics
 from sklearn.datasets import fetch_california_housing
 import matplotlib.pyplot as plt
-import networkx as nx
+
 
 housing = fetch_california_housing(as_frame=True)
 df = housing.frame
